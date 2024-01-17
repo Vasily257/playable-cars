@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import * as TWEEN from '@tweenjs/tween.js';
 import { ASSETS } from './scripts/assets';
 import { changeCursorOnHover } from './scripts/cursor';
-import { type AssetOptions } from './types/assets.js';
+import type { AssetOptions, Line } from './types/assets.js';
 import './styles/index.css';
 
 /** Координаты якоря ресурсов */
@@ -10,6 +10,20 @@ const ASSETS_ANCHOR_COORS = 0.5;
 
 /** Настройки ресурсов (изображений), индексированные по названию */
 const ixAssets: Record<string, AssetOptions> = {};
+
+/** Линии от машин к парковочным местам, индексированные по названию */
+const ixGraphicLines: Record<string, Line> = {
+  red: {
+    isDrawn: false,
+    points: [],
+    graphics: null,
+  },
+  yellow: {
+    isDrawn: false,
+    points: [],
+    graphics: null,
+  },
+};
 
 /** Конфигурация PIXI-приложения */
 const PIXIConfig: Partial<PIXI.IApplicationOptions> = {
@@ -26,15 +40,6 @@ const PIXIConfig: Partial<PIXI.IApplicationOptions> = {
 
 /** PIXI-приложение */
 const app = new PIXI.Application<HTMLCanvasElement>(PIXIConfig);
-
-const graphics = new PIXI.Graphics();
-app.stage.addChild(graphics);
-
-/** Включен ли режим рисования */
-let isDrawing = false;
-
-/** Точки нарисованной линии */
-let linePoints: PIXI.Point[] = [];
 
 /** Добавить canvas в DOM */
 const addAppToDOM = (): void => {
@@ -54,6 +59,16 @@ const addImagesToStage = (): void => {
     sprite.anchor.set(ASSETS_ANCHOR_COORS);
     sprite.x = app.screen.width * assetOptions.x;
     sprite.y = app.screen.height * assetOptions.y;
+  }
+};
+
+/** Добавить пустые линии на сцену приложения */
+const addLinesToStage = (): void => {
+  for (const key of Object.keys(ixGraphicLines)) {
+    const graphics = new PIXI.Graphics();
+    ixGraphicLines[key].graphics = graphics;
+
+    app.stage.addChild(graphics);
   }
 };
 
@@ -104,36 +119,75 @@ const changeCarCursors = (): void => {
 
 /** Обработать нажатие кнопки мыши */
 const handleMouseDown = (event: PIXI.FederatedMouseEvent): void => {
-  isDrawing = true;
+  const clickPoint = new PIXI.Point(event.pageX, event.pageY);
 
-  linePoints = [];
-  linePoints.push(new PIXI.Point(event.pageX, event.pageY));
+  const isRedCarClick = ixAssets.carRed.sprite?.containsPoint(clickPoint);
+  const isYellowCarClick = ixAssets.carYellow.sprite?.containsPoint(clickPoint);
+
+  if (isRedCarClick ?? false) {
+    ixGraphicLines.red.isDrawn = true;
+    ixGraphicLines.red.points.push(clickPoint);
+  }
+
+  if (isYellowCarClick ?? false) {
+    ixGraphicLines.yellow.isDrawn = true;
+    ixGraphicLines.yellow.points.push(clickPoint);
+  }
 };
 
 /** Обработать перемещение курсора */
 const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
-  if (isDrawing) {
+  if (ixGraphicLines.red.isDrawn) {
     const currentPosition = new PIXI.Point(event.pageX, event.pageY);
 
-    linePoints.push(currentPosition);
+    ixGraphicLines.red.points.push(currentPosition);
 
-    graphics.lineStyle(10, 'D1191F1A');
+    if (ixGraphicLines.red.graphics !== null) {
+      ixGraphicLines.red.graphics.lineStyle(10, 'D1191F');
 
-    for (let i = 1; i < linePoints.length; i++) {
-      const startPoint = linePoints[i - 1];
-      const endPoint = linePoints[i];
+      for (let i = 1; i < ixGraphicLines.red.points.length; i++) {
+        const startPoint = ixGraphicLines.red.points[i - 1];
+        const endPoint = ixGraphicLines.red.points[i];
 
-      graphics.moveTo(startPoint.x, startPoint.y);
-      graphics.lineTo(endPoint.x, endPoint.y);
+        ixGraphicLines.red.graphics.moveTo(startPoint.x, startPoint.y);
+        ixGraphicLines.red.graphics.lineTo(endPoint.x, endPoint.y);
+      }
+    }
+  }
+
+  if (ixGraphicLines.yellow.isDrawn) {
+    const currentPosition = new PIXI.Point(event.pageX, event.pageY);
+
+    ixGraphicLines.yellow.points.push(currentPosition);
+
+    if (ixGraphicLines.yellow.graphics !== null) {
+      ixGraphicLines.yellow.graphics.lineStyle(10, 'FFC841');
+
+      for (let i = 1; i < ixGraphicLines.yellow.points.length; i++) {
+        const startPoint = ixGraphicLines.yellow.points[i - 1];
+        const endPoint = ixGraphicLines.yellow.points[i];
+
+        ixGraphicLines.yellow.graphics.moveTo(startPoint.x, startPoint.y);
+        ixGraphicLines.yellow.graphics.lineTo(endPoint.x, endPoint.y);
+      }
     }
   }
 };
 
 /** Обработать отпускание кнопки мыши */
 const handleMouseUp = (): void => {
-  isDrawing = false;
+  ixGraphicLines.red.isDrawn = false;
+  ixGraphicLines.yellow.isDrawn = false;
 
-  graphics.clear();
+  if (ixGraphicLines.red.graphics !== null) {
+    ixGraphicLines.red.graphics.clear();
+    ixGraphicLines.red.points = [];
+  }
+
+  if (ixGraphicLines.yellow.graphics !== null) {
+    ixGraphicLines.yellow.graphics.clear();
+    ixGraphicLines.yellow.points = [];
+  }
 };
 
 /** Изменить размер сцены */
@@ -155,6 +209,7 @@ const resizeApp = (): void => {
 // Инициализировать приложение
 addAppToDOM();
 addImagesToStage();
+addLinesToStage();
 moveHandToRedParking();
 changeCarCursors();
 
