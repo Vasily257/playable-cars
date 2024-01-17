@@ -27,6 +27,15 @@ const PIXIConfig: Partial<PIXI.IApplicationOptions> = {
 /** PIXI-приложение */
 const app = new PIXI.Application<HTMLCanvasElement>(PIXIConfig);
 
+const graphics = new PIXI.Graphics();
+app.stage.addChild(graphics);
+
+/** Включен ли режим рисования */
+let isDrawing = false;
+
+/** Точки нарисованной линии */
+let linePoints: PIXI.Point[] = [];
+
 /** Добавить canvas в DOM */
 const addAppToDOM = (): void => {
   document.body.appendChild(app.view);
@@ -93,6 +102,40 @@ const changeCarCursors = (): void => {
   }
 };
 
+/** Обработать нажатие кнопки мыши */
+const handleMouseDown = (event: PIXI.FederatedMouseEvent): void => {
+  isDrawing = true;
+
+  linePoints = [];
+  linePoints.push(new PIXI.Point(event.pageX, event.pageY));
+};
+
+/** Обработать перемещение курсора */
+const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
+  if (isDrawing) {
+    const currentPosition = new PIXI.Point(event.pageX, event.pageY);
+
+    linePoints.push(currentPosition);
+
+    graphics.lineStyle(10, 'D1191F1A');
+
+    for (let i = 1; i < linePoints.length; i++) {
+      const startPoint = linePoints[i - 1];
+      const endPoint = linePoints[i];
+
+      graphics.moveTo(startPoint.x, startPoint.y);
+      graphics.lineTo(endPoint.x, endPoint.y);
+    }
+  }
+};
+
+/** Обработать отпускание кнопки мыши */
+const handleMouseUp = (): void => {
+  isDrawing = false;
+
+  graphics.clear();
+};
+
 /** Изменить размер сцены */
 const resizeApp = (): void => {
   // Задать новые размеры сцены
@@ -119,6 +162,20 @@ changeCarCursors();
 app.ticker.add(() => {
   TWEEN.update();
 });
+
+// Добавляем обработчики событий мыши на канвас
+app.view.addEventListener(
+  'mousedown',
+  handleMouseDown as (event: MouseEvent) => void,
+);
+app.view.addEventListener(
+  'mousemove',
+  handleMouseMove as (event: MouseEvent) => void,
+);
+app.view.addEventListener(
+  'mouseup',
+  handleMouseUp as (event: MouseEvent) => void,
+);
 
 /** Обработать изменение размера экрана */
 const handleResize = (): void => {
