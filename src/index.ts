@@ -53,13 +53,14 @@ const moveHandToRedParking = (): void => {
   let endX = 0;
   let endY = 0;
 
-  const offsetX = 0.005;
-  const offsetY = 0.15;
+  const OFFSET_X = 0.005;
+  const OFFSET_Y = 0.15;
+  const MOVING_TIME = 1000;
 
   const parkingMarkRed = ixAssets.parkingMarkRed;
 
-  endX = app.screen.width * (parkingMarkRed?.x + offsetX);
-  endY = app.screen.height * (parkingMarkRed?.y + offsetY);
+  endX = app.screen.width * (parkingMarkRed?.x + OFFSET_X);
+  endY = app.screen.height * (parkingMarkRed?.y + OFFSET_Y);
 
   const handSprite = ixAssets.hand.sprite;
 
@@ -70,7 +71,7 @@ const moveHandToRedParking = (): void => {
           x: endX,
           y: endY,
         },
-        1000,
+        MOVING_TIME,
       )
       .repeat(Infinity)
       .easing(TWEEN.Easing.Linear.None)
