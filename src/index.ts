@@ -13,7 +13,7 @@ import gameLogoPng from './assets/game-logo.png';
 import playNowPng from './assets/play-now.png';
 import failPng from './assets/fail.png';
 
-import type { Asset, AssetName, Line } from './types/assets.js';
+import { AssetName, LineName, type Asset, type Line } from './types/types';
 import './styles/index.css';
 
 /** Координаты якоря ресурсов */
@@ -26,117 +26,8 @@ const HAND_MOVEMENT_ANIMATION = {
   duration: 1000,
 };
 
-/** Ресурсы, индексированные по названию */
-const ixAssets: Record<AssetName, Asset> = {
-  carGreen: {
-    source: carGreenPng,
-    x: 0.195,
-    y: 0.21,
-    sprite: null,
-  },
-  carBlue: {
-    source: carBluePng,
-    x: 0.795,
-    y: 0.21,
-    sprite: null,
-  },
-  carRed: {
-    source: carRedPng,
-    x: 0.295,
-    y: 0.555,
-    sprite: null,
-  },
-  carYellow: {
-    source: carYellowPng,
-    x: 0.7,
-    y: 0.555,
-    sprite: null,
-  },
-  hand: {
-    source: handPng,
-    x: 0.475,
-    y: 0.525,
-    sprite: null,
-  },
-  parkingLine1: {
-    source: parkingLinePng,
-    x: 0.905,
-    y: 0.025,
-    sprite: null,
-  },
-  parkingLine2: {
-    source: parkingLinePng,
-    x: 0.702,
-    y: 0.025,
-    sprite: null,
-  },
-  parkingLine3: {
-    source: parkingLinePng,
-    x: 0.499,
-    y: 0.025,
-    sprite: null,
-  },
-  parkingLine4: {
-    source: parkingLinePng,
-    x: 0.293,
-    y: 0.025,
-    sprite: null,
-  },
-  parkingLine5: {
-    source: parkingLinePng,
-    x: 0.09,
-    y: 0.025,
-    sprite: null,
-  },
-
-  parkingMarkYellow: {
-    source: parkingMarkYellowPng,
-    x: 0.394,
-    y: 0.183,
-    sprite: null,
-  },
-  parkingMarkRed: {
-    source: parkingMarkRedPng,
-    x: 0.609,
-    y: 0.183,
-    sprite: null,
-  },
-  gameLogo: {
-    source: gameLogoPng,
-    x: 2,
-    y: 2,
-    sprite: null,
-  },
-  playNow: {
-    source: playNowPng,
-    x: 2,
-    y: 2,
-    sprite: null,
-  },
-  fail: {
-    source: failPng,
-    x: 2,
-    y: 2,
-    sprite: null,
-  },
-};
-
-/** Линии от машин к парковочным местам, индексированные по названию */
-const ixGraphicLines: Record<string, Line> = {
-  red: {
-    isDrawn: false,
-    points: [],
-    graphics: null,
-  },
-  yellow: {
-    isDrawn: false,
-    points: [],
-    graphics: null,
-  },
-};
-
 /** Конфигурация PIXI-приложения */
-const PIXIConfig: Partial<PIXI.IApplicationOptions> = {
+const PIXI_CONFIG: Partial<PIXI.IApplicationOptions> = {
   background: '#545454',
   resizeTo: window,
   eventMode: 'passive',
@@ -149,7 +40,119 @@ const PIXIConfig: Partial<PIXI.IApplicationOptions> = {
 };
 
 /** PIXI-приложение */
-const app = new PIXI.Application<HTMLCanvasElement>(PIXIConfig);
+const app = new PIXI.Application<HTMLCanvasElement>(PIXI_CONFIG);
+
+/** Ресурсы, индексированные по названию */
+const ixAssets: Record<AssetName, Asset> = {
+  [AssetName.CarGreen]: {
+    source: carGreenPng,
+    x: 0.195,
+    y: 0.21,
+    sprite: null,
+  },
+  [AssetName.CarBlue]: {
+    source: carBluePng,
+    x: 0.795,
+    y: 0.21,
+    sprite: null,
+  },
+  [AssetName.CarRed]: {
+    source: carRedPng,
+    x: 0.295,
+    y: 0.555,
+    sprite: null,
+  },
+  [AssetName.CarYellow]: {
+    source: carYellowPng,
+    x: 0.7,
+    y: 0.555,
+    sprite: null,
+  },
+  [AssetName.Hand]: {
+    source: handPng,
+    x: 0.475,
+    y: 0.525,
+    sprite: null,
+  },
+  [AssetName.ParkingLine1]: {
+    source: parkingLinePng,
+    x: 0.905,
+    y: 0.025,
+    sprite: null,
+  },
+  [AssetName.ParkingLine2]: {
+    source: parkingLinePng,
+    x: 0.702,
+    y: 0.025,
+    sprite: null,
+  },
+  [AssetName.ParkingLine3]: {
+    source: parkingLinePng,
+    x: 0.499,
+    y: 0.025,
+    sprite: null,
+  },
+  [AssetName.ParkingLine4]: {
+    source: parkingLinePng,
+    x: 0.293,
+    y: 0.025,
+    sprite: null,
+  },
+  [AssetName.ParkingLine5]: {
+    source: parkingLinePng,
+    x: 0.09,
+    y: 0.025,
+    sprite: null,
+  },
+  [AssetName.ParkingMarkYellow]: {
+    source: parkingMarkYellowPng,
+    x: 0.394,
+    y: 0.183,
+    sprite: null,
+  },
+  [AssetName.ParkingMarkRed]: {
+    source: parkingMarkRedPng,
+    x: 0.609,
+    y: 0.183,
+    sprite: null,
+  },
+  [AssetName.GameLogo]: {
+    source: gameLogoPng,
+    x: 2,
+    y: 2,
+    sprite: null,
+  },
+  [AssetName.PlayNow]: {
+    source: playNowPng,
+    x: 2,
+    y: 2,
+    sprite: null,
+  },
+  [AssetName.Fail]: {
+    source: failPng,
+    x: 2,
+    y: 2,
+    sprite: null,
+  },
+};
+
+/** Линии от машин к парковочным местам, индексированные по названию */
+const ixLines: Record<LineName, Line> = {
+  [LineName.Red]: {
+    size: 10,
+    hexColor: 'D1191F',
+    isDrawn: false,
+    points: [],
+    graphics: null,
+  },
+  [LineName.Yellow]: {
+    size: 10,
+    hexColor: 'FFC841',
+    isDrawn: false,
+    points: [],
+    graphics: null,
+  },
+};
 
 /** Добавить canvas в DOM */
 const addAppToDOM = (): void => {
@@ -168,7 +171,7 @@ const configurteAssetsAndAddThemToStage = (): void => {
     sprite.y = app.screen.height * assetOptions.y;
 
     // Добавить курсор-поинтер для интерактивных ресурсов
-    if (key === 'carRed' || key === 'carYellow') {
+    if (key === AssetName.CarRed || key === AssetName.CarYellow) {
       sprite.interactive = true;
       sprite.cursor = 'pointer';
     }
@@ -183,9 +186,9 @@ const configurteAssetsAndAddThemToStage = (): void => {
 
 /** Добавить пустые линии на сцену приложения */
 const addLinesToStage = (): void => {
-  for (const key of Object.keys(ixGraphicLines)) {
+  for (const key of Object.keys(ixLines)) {
     const graphics = new PIXI.Graphics();
-    ixGraphicLines[key].graphics = graphics;
+    ixLines[key as LineName].graphics = graphics;
 
     app.stage.addChild(graphics);
   }
@@ -193,14 +196,14 @@ const addLinesToStage = (): void => {
 
 /** Переместить указатель (руку) до цели (красной парковки) */
 const moveHandToRedParking = (): void => {
-  const parkingMarkRed = ixAssets.parkingMarkRed;
+  const parkingMarkRed = ixAssets[AssetName.ParkingMarkRed];
 
   const { offsetX, offsetY, duration } = HAND_MOVEMENT_ANIMATION;
 
   const endX = app.screen.width * (parkingMarkRed?.x + offsetX);
   const endY = app.screen.height * (parkingMarkRed?.y + offsetY);
 
-  const handSprite = ixAssets.hand.sprite;
+  const handSprite = ixAssets[AssetName.Hand].sprite;
 
   if (handSprite !== null) {
     new TWEEN.Tween(handSprite)
@@ -220,58 +223,50 @@ const moveHandToRedParking = (): void => {
   }
 };
 
+/** Получить спрайты интерактивных машин, индексированные по цветам (именам линий) */
+const getInteractiveCarSprites = (): Record<LineName, PIXI.Sprite | null> => {
+  return {
+    [LineName.Red]: ixAssets[AssetName.CarRed].sprite,
+    [LineName.Yellow]: ixAssets[AssetName.CarYellow].sprite,
+  };
+};
+
 /** Обработать нажатие кнопки мыши */
 const handleMouseDown = (event: PIXI.FederatedMouseEvent): void => {
   const clickPoint = new PIXI.Point(event.pageX, event.pageY);
+  const interactiveCarSprites = getInteractiveCarSprites();
 
-  const isRedCarClick = ixAssets.carRed.sprite?.containsPoint(clickPoint);
-  const isYellowCarClick = ixAssets.carYellow.sprite?.containsPoint(clickPoint);
+  // Определить машину, по которой кликнули,
+  // и активировать линию соответствующего цвета
+  for (const [carColor, carSprite] of Object.entries(interactiveCarSprites)) {
+    const isCarClick = carSprite?.containsPoint(clickPoint) ?? false;
+    const lineColor = carColor as LineName;
 
-  if (isRedCarClick ?? false) {
-    ixGraphicLines.red.isDrawn = true;
-    ixGraphicLines.red.points.push(clickPoint);
-  }
-
-  if (isYellowCarClick ?? false) {
-    ixGraphicLines.yellow.isDrawn = true;
-    ixGraphicLines.yellow.points.push(clickPoint);
+    if (isCarClick) {
+      ixLines[lineColor].isDrawn = true;
+      ixLines[lineColor].points.push(clickPoint);
+    }
   }
 };
 
 /** Обработать перемещение курсора */
 const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
-  if (ixGraphicLines.red.isDrawn) {
-    const currentPosition = new PIXI.Point(event.pageX, event.pageY);
+  const currentPosition = new PIXI.Point(event.pageX, event.pageY);
 
-    ixGraphicLines.red.points.push(currentPosition);
+  // Перебрать существующие линии
+  for (const line of Object.values(ixLines)) {
+    if (line.isDrawn && line.graphics !== null) {
+      // Добавить новую точку и определить стиль линии
+      line.points.push(currentPosition);
+      line.graphics.lineStyle(line.size, line.hexColor);
 
-    if (ixGraphicLines.red.graphics !== null) {
-      ixGraphicLines.red.graphics.lineStyle(10, 'D1191F');
+      // Построить линию по точкам
+      for (let i = 1; i < line.points.length; i++) {
+        const startPoint = line.points[i - 1];
+        const endPoint = line.points[i];
 
-      for (let i = 1; i < ixGraphicLines.red.points.length; i++) {
-        const startPoint = ixGraphicLines.red.points[i - 1];
-        const endPoint = ixGraphicLines.red.points[i];
-
-        ixGraphicLines.red.graphics.moveTo(startPoint.x, startPoint.y);
-        ixGraphicLines.red.graphics.lineTo(endPoint.x, endPoint.y);
-      }
-    }
-  }
-
-  if (ixGraphicLines.yellow.isDrawn) {
-    const currentPosition = new PIXI.Point(event.pageX, event.pageY);
-
-    ixGraphicLines.yellow.points.push(currentPosition);
-
-    if (ixGraphicLines.yellow.graphics !== null) {
-      ixGraphicLines.yellow.graphics.lineStyle(10, 'FFC841');
-
-      for (let i = 1; i < ixGraphicLines.yellow.points.length; i++) {
-        const startPoint = ixGraphicLines.yellow.points[i - 1];
-        const endPoint = ixGraphicLines.yellow.points[i];
-
-        ixGraphicLines.yellow.graphics.moveTo(startPoint.x, startPoint.y);
-        ixGraphicLines.yellow.graphics.lineTo(endPoint.x, endPoint.y);
+        line.graphics.moveTo(startPoint.x, startPoint.y);
+        line.graphics.lineTo(endPoint.x, endPoint.y);
       }
     }
   }
@@ -279,17 +274,12 @@ const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
 
 /** Обработать отпускание кнопки мыши */
 const handleMouseUp = (): void => {
-  ixGraphicLines.red.isDrawn = false;
-  ixGraphicLines.yellow.isDrawn = false;
-
-  if (ixGraphicLines.red.graphics !== null) {
-    ixGraphicLines.red.graphics.clear();
-    ixGraphicLines.red.points = [];
-  }
-
-  if (ixGraphicLines.yellow.graphics !== null) {
-    ixGraphicLines.yellow.graphics.clear();
-    ixGraphicLines.yellow.points = [];
+  for (const line of Object.values(ixLines)) {
+    if (line.isDrawn && line.graphics !== null) {
+      line.isDrawn = false;
+      line.graphics.clear();
+      line.points = [];
+    }
   }
 };
 
