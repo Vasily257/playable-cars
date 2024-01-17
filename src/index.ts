@@ -5,8 +5,8 @@ import { changeCursorOnHover } from './scripts/cursor';
 import { type AssetOptions } from './types/assets.js';
 import './styles/index.css';
 
-/** x и y координаты якоря */
-const ANCHOR_COORS = 0.5;
+/** Координаты якоря ресурсов */
+const ASSETS_ANCHOR_COORS = 0.5;
 
 /** Настройки ресурсов (изображений), индексированные по названию */
 const ixAssets: Record<string, AssetOptions> = {};
@@ -42,7 +42,7 @@ const addImagesToStage = (): void => {
     app.stage.addChild(sprite);
 
     // Задать начальное положение ресурсов
-    sprite.anchor.set(ANCHOR_COORS);
+    sprite.anchor.set(ASSETS_ANCHOR_COORS);
     sprite.x = app.screen.width * assetOptions.x;
     sprite.y = app.screen.height * assetOptions.y;
   }
