@@ -13,7 +13,7 @@ import failPng from '../assets/fail.png';
 import { type AssetOptions } from '../types/assets';
 
 /** Ресурсы и их относительные позиции на сцене */
-const STATIC_ASSETS: Record<string, AssetOptions> = {
+const ASSETS: Record<string, AssetOptions> = {
   carGreen: {
     source: carGreenPng,
     x: 0.195,
@@ -107,4 +107,4 @@ const STATIC_ASSETS: Record<string, AssetOptions> = {
   },
 };
 
-export { STATIC_ASSETS };
+export { ASSETS };

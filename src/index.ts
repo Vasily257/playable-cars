@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as TWEEN from '@tweenjs/tween.js';
+import { ASSETS } from './scripts/assets';
 import { changeCursorOnHover } from './scripts/cursor';
 import { type AssetOptions } from './types/assets.js';
 import './styles/index.css';
@@ -33,7 +34,7 @@ const addAppToDOM = (): void => {
 
 /** Добавить изображения на сцену приложения */
 const addImagesToStage = (): void => {
-  for (const [key, assetOptions] of Object.entries(STATIC_ASSETS)) {
+  for (const [key, assetOptions] of Object.entries(ASSETS)) {
     const sprite = PIXI.Sprite.from(assetOptions.source);
     ixAssets[key] = { ...assetOptions, sprite };
 
@@ -80,7 +81,7 @@ const moveHandToRedParking = (): void => {
   }
 };
 
-/** Поменять курсор машин */
+/** Поменять курсор при наведении на машины */
 const changeCarCursors = (): void => {
   const redCar = ixAssets.carRed.sprite;
   const yellowCar = ixAssets.carYellow.sprite;
