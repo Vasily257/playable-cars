@@ -1,15 +1,15 @@
 import * as PIXI from 'pixi.js';
 import * as TWEEN from '@tweenjs/tween.js';
-import { ASSETS } from './scripts/assets';
+import { IX_ASSETS } from './scripts/assets';
 import { changeCursorOnHover } from './scripts/cursor';
-import type { Asset, Line } from './types/assets.js';
+import type { Asset, AssetName, Line } from './types/assets.js';
 import './styles/index.css';
 
 /** Координаты якоря ресурсов */
 const ASSETS_ANCHOR_COORS = 0.5;
 
 /** Настройки ресурсов (изображений), индексированные по названию */
-const ixAssets: Record<string, Asset> = {};
+const ixAssets: Record<AssetName, Asset> = { ...IX_ASSETS };
 
 /** Линии от машин к парковочным местам, индексированные по названию */
 const ixGraphicLines: Record<string, Line> = {
@@ -48,9 +48,9 @@ const addAppToDOM = (): void => {
 
 /** Добавить изображения на сцену приложения */
 const addImagesToStage = (): void => {
-  for (const [key, assetOptions] of Object.entries(ASSETS)) {
+  for (const [key, assetOptions] of Object.entries(IX_ASSETS)) {
     const sprite = PIXI.Sprite.from(assetOptions.source);
-    ixAssets[key] = { ...assetOptions, sprite };
+    ixAssets[key as AssetName].sprite = sprite;
 
     // Добавить изображения на сцену
     app.stage.addChild(sprite);
@@ -196,7 +196,7 @@ const resizeApp = (): void => {
   app.renderer.resize(window.innerWidth, window.innerHeight);
 
   for (const [key, options] of Object.entries(ixAssets)) {
-    const { x, y } = ixAssets[key];
+    const { x, y } = ixAssets[key as AssetName];
 
     // Сохранить позиции изображений
     if (options.sprite !== null) {

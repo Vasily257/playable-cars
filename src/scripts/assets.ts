@@ -10,10 +10,10 @@ import gameLogoPng from '../assets/game-logo.png';
 import playNowPng from '../assets/play-now.png';
 import failPng from '../assets/fail.png';
 
-import { type Asset } from '../types/assets';
+import type { Asset, AssetName } from '../types/assets';
 
 /** Ресурсы и их относительные позиции на сцене */
-const ASSETS: Record<string, Asset> = {
+const IX_ASSETS: Record<AssetName, Asset> = {
   carGreen: {
     source: carGreenPng,
     x: 0.195,
@@ -105,6 +105,6 @@ const ASSETS: Record<string, Asset> = {
     y: 2,
     sprite: null,
   },
-};
+} as const;
 
-export { ASSETS };
+export { IX_ASSETS };
