@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as TWEEN from '@tweenjs/tween.js';
 import { IX_ASSETS } from './scripts/assets';
-import { changeCursorOnHover } from './scripts/cursor';
 import type { Asset, AssetName, Line } from './types/assets.js';
 import './styles/index.css';
 
@@ -46,19 +45,28 @@ const addAppToDOM = (): void => {
   document.body.appendChild(app.view);
 };
 
-/** Добавить изображения на сцену приложения */
-const addImagesToStage = (): void => {
+/** Настроить ресурсы и добавить их на сцену */
+const configurteAssetsAndAddThemToStage = (): void => {
   for (const [key, assetOptions] of Object.entries(IX_ASSETS)) {
+    /** Спрайт на основе ресурса */
     const sprite = PIXI.Sprite.from(assetOptions.source);
-    ixAssets[key as AssetName].sprite = sprite;
 
-    // Добавить изображения на сцену
-    app.stage.addChild(sprite);
-
-    // Задать начальное положение ресурсов
+    // Задать начальное положение спрайта
     sprite.anchor.set(ASSETS_ANCHOR_COORS);
     sprite.x = app.screen.width * assetOptions.x;
     sprite.y = app.screen.height * assetOptions.y;
+
+    // Добавить курсор-поинтер для интерактивных ресурсов
+    if (key === 'carRed' || key === 'carYellow') {
+      sprite.interactive = true;
+      sprite.cursor = 'pointer';
+    }
+
+    // Добавить спрайт на сцену
+    app.stage.addChild(sprite);
+
+    // Сохранить ссылку на спрайт
+    ixAssets[key as AssetName].sprite = sprite;
   }
 };
 
@@ -103,17 +111,6 @@ const moveHandToRedParking = (): void => {
         console.log('Анимация завершена!');
       })
       .start();
-  }
-};
-
-/** Поменять курсор при наведении на машины */
-const changeCarCursors = (): void => {
-  const redCar = ixAssets.carRed.sprite;
-  const yellowCar = ixAssets.carYellow.sprite;
-
-  if (redCar !== null && yellowCar !== null) {
-    changeCursorOnHover(redCar, 'pointer');
-    changeCursorOnHover(yellowCar, 'pointer');
   }
 };
 
@@ -208,10 +205,9 @@ const resizeApp = (): void => {
 
 // Инициализировать приложение
 addAppToDOM();
-addImagesToStage();
+configurteAssetsAndAddThemToStage();
 addLinesToStage();
 moveHandToRedParking();
-changeCarCursors();
 
 // Запустить анимацию
 app.ticker.add(() => {
