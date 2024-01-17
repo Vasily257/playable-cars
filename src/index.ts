@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import * as TWEEN from '@tweenjs/tween.js';
 import { STATIC_ASSETS } from './scripts/images';
 import { type AssetOptions } from './types/assets.js';
 import './styles/index.css';
@@ -46,6 +47,39 @@ const addImagesToStage = (): void => {
   }
 };
 
+/** Переместить указатель (руку) до цели (красной парковки) */
+const moveHandToRedParking = (): void => {
+  let endX = 0;
+  let endY = 0;
+
+  const offsetX = 0.005;
+  const offsetY = 0.15;
+
+  const parkingMarkRed = ixAssets.parkingMarkRed;
+
+  endX = app.screen.width * (parkingMarkRed?.x + offsetX);
+  endY = app.screen.height * (parkingMarkRed?.y + offsetY);
+
+  const handSprite = ixAssets.hand.sprite;
+
+  if (handSprite !== null) {
+    new TWEEN.Tween(handSprite)
+      .to(
+        {
+          x: endX,
+          y: endY,
+        },
+        1000,
+      )
+      .repeat(Infinity)
+      .easing(TWEEN.Easing.Linear.None)
+      .onComplete(() => {
+        console.log('Анимация завершена!');
+      })
+      .start();
+  }
+};
+
 /** Изменить размер сцены */
 const resizeApp = (): void => {
   // Задать новые размеры сцены
@@ -65,6 +99,18 @@ const resizeApp = (): void => {
 // Инициализировать приложение
 addAppToDOM();
 addImagesToStage();
+moveHandToRedParking();
+
+// Запустить анимацию
+app.ticker.add(() => {
+  TWEEN.update();
+});
+
+/** Обработать изменение размера экрана */
+const handleResize = (): void => {
+  resizeApp();
+  moveHandToRedParking();
+};
 
 // Добавить слушатели
-window.addEventListener('resize', resizeApp);
+window.addEventListener('resize', handleResize);
