@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import * as TWEEN from '@tweenjs/tween.js';
-import { STATIC_ASSETS } from './scripts/images';
+import { changeCursorOnHover } from './scripts/cursor';
 import { type AssetOptions } from './types/assets.js';
 import './styles/index.css';
 
@@ -80,6 +80,17 @@ const moveHandToRedParking = (): void => {
   }
 };
 
+/** Поменять курсор машин */
+const changeCarCursors = (): void => {
+  const redCar = ixAssets.carRed.sprite;
+  const yellowCar = ixAssets.carYellow.sprite;
+
+  if (redCar !== null && yellowCar !== null) {
+    changeCursorOnHover(redCar, 'pointer');
+    changeCursorOnHover(yellowCar, 'pointer');
+  }
+};
+
 /** Изменить размер сцены */
 const resizeApp = (): void => {
   // Задать новые размеры сцены
@@ -100,6 +111,7 @@ const resizeApp = (): void => {
 addAppToDOM();
 addImagesToStage();
 moveHandToRedParking();
+changeCarCursors();
 
 // Запустить анимацию
 app.ticker.add(() => {
