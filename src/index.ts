@@ -1,14 +1,125 @@
 import * as PIXI from 'pixi.js';
 import * as TWEEN from '@tweenjs/tween.js';
-import { IX_ASSETS } from './scripts/assets';
+
+import carBluePng from './assets/car-blue.png';
+import carRedPng from './assets/car-red.png';
+import carGreenPng from './assets/car-green.png';
+import carYellowPng from './assets/car-yellow.png';
+import handPng from './assets/hand.png';
+import parkingLinePng from './assets/parking-line.png';
+import parkingMarkRedPng from './assets/parking-mark-red.png';
+import parkingMarkYellowPng from './assets/parking-mark-yellow.png';
+import gameLogoPng from './assets/game-logo.png';
+import playNowPng from './assets/play-now.png';
+import failPng from './assets/fail.png';
+
 import type { Asset, AssetName, Line } from './types/assets.js';
 import './styles/index.css';
 
 /** Координаты якоря ресурсов */
 const ASSETS_ANCHOR_COORS = 0.5;
 
-/** Настройки ресурсов (изображений), индексированные по названию */
-const ixAssets: Record<AssetName, Asset> = { ...IX_ASSETS };
+/** Настройки анимации движения руки */
+const HAND_MOVEMENT_ANIMATION = {
+  offsetX: 0.005,
+  offsetY: 0.15,
+  duration: 1000,
+};
+
+/** Ресурсы, индексированные по названию */
+const ixAssets: Record<AssetName, Asset> = {
+  carGreen: {
+    source: carGreenPng,
+    x: 0.195,
+    y: 0.21,
+    sprite: null,
+  },
+  carBlue: {
+    source: carBluePng,
+    x: 0.795,
+    y: 0.21,
+    sprite: null,
+  },
+  carRed: {
+    source: carRedPng,
+    x: 0.295,
+    y: 0.555,
+    sprite: null,
+  },
+  carYellow: {
+    source: carYellowPng,
+    x: 0.7,
+    y: 0.555,
+    sprite: null,
+  },
+  hand: {
+    source: handPng,
+    x: 0.475,
+    y: 0.525,
+    sprite: null,
+  },
+  parkingLine1: {
+    source: parkingLinePng,
+    x: 0.905,
+    y: 0.025,
+    sprite: null,
+  },
+  parkingLine2: {
+    source: parkingLinePng,
+    x: 0.702,
+    y: 0.025,
+    sprite: null,
+  },
+  parkingLine3: {
+    source: parkingLinePng,
+    x: 0.499,
+    y: 0.025,
+    sprite: null,
+  },
+  parkingLine4: {
+    source: parkingLinePng,
+    x: 0.293,
+    y: 0.025,
+    sprite: null,
+  },
+  parkingLine5: {
+    source: parkingLinePng,
+    x: 0.09,
+    y: 0.025,
+    sprite: null,
+  },
+
+  parkingMarkYellow: {
+    source: parkingMarkYellowPng,
+    x: 0.394,
+    y: 0.183,
+    sprite: null,
+  },
+  parkingMarkRed: {
+    source: parkingMarkRedPng,
+    x: 0.609,
+    y: 0.183,
+    sprite: null,
+  },
+  gameLogo: {
+    source: gameLogoPng,
+    x: 2,
+    y: 2,
+    sprite: null,
+  },
+  playNow: {
+    source: playNowPng,
+    x: 2,
+    y: 2,
+    sprite: null,
+  },
+  fail: {
+    source: failPng,
+    x: 2,
+    y: 2,
+    sprite: null,
+  },
+};
 
 /** Линии от машин к парковочным местам, индексированные по названию */
 const ixGraphicLines: Record<string, Line> = {
@@ -47,7 +158,7 @@ const addAppToDOM = (): void => {
 
 /** Настроить ресурсы и добавить их на сцену */
 const configurteAssetsAndAddThemToStage = (): void => {
-  for (const [key, assetOptions] of Object.entries(IX_ASSETS)) {
+  for (const [key, assetOptions] of Object.entries(ixAssets)) {
     /** Спрайт на основе ресурса */
     const sprite = PIXI.Sprite.from(assetOptions.source);
 
@@ -82,17 +193,12 @@ const addLinesToStage = (): void => {
 
 /** Переместить указатель (руку) до цели (красной парковки) */
 const moveHandToRedParking = (): void => {
-  let endX = 0;
-  let endY = 0;
-
-  const OFFSET_X = 0.005;
-  const OFFSET_Y = 0.15;
-  const MOVING_TIME = 1000;
-
   const parkingMarkRed = ixAssets.parkingMarkRed;
 
-  endX = app.screen.width * (parkingMarkRed?.x + OFFSET_X);
-  endY = app.screen.height * (parkingMarkRed?.y + OFFSET_Y);
+  const { offsetX, offsetY, duration } = HAND_MOVEMENT_ANIMATION;
+
+  const endX = app.screen.width * (parkingMarkRed?.x + offsetX);
+  const endY = app.screen.height * (parkingMarkRed?.y + offsetY);
 
   const handSprite = ixAssets.hand.sprite;
 
@@ -103,7 +209,7 @@ const moveHandToRedParking = (): void => {
           x: endX,
           y: endY,
         },
-        MOVING_TIME,
+        duration,
       )
       .repeat(Infinity)
       .easing(TWEEN.Easing.Linear.None)
