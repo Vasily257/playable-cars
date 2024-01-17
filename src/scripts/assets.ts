@@ -10,10 +10,10 @@ import gameLogoPng from '../assets/game-logo.png';
 import playNowPng from '../assets/play-now.png';
 import failPng from '../assets/fail.png';
 
-import { type AssetOptions } from '../types/assets';
+import { type Asset } from '../types/assets';
 
 /** Ресурсы и их относительные позиции на сцене */
-const ASSETS: Record<string, AssetOptions> = {
+const ASSETS: Record<string, Asset> = {
   carGreen: {
     source: carGreenPng,
     x: 0.195,

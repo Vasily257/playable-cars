@@ -2,14 +2,14 @@ import * as PIXI from 'pixi.js';
 import * as TWEEN from '@tweenjs/tween.js';
 import { ASSETS } from './scripts/assets';
 import { changeCursorOnHover } from './scripts/cursor';
-import type { AssetOptions, Line } from './types/assets.js';
+import type { Asset, Line } from './types/assets.js';
 import './styles/index.css';
 
 /** Координаты якоря ресурсов */
 const ASSETS_ANCHOR_COORS = 0.5;
 
 /** Настройки ресурсов (изображений), индексированные по названию */
-const ixAssets: Record<string, AssetOptions> = {};
+const ixAssets: Record<string, Asset> = {};
 
 /** Линии от машин к парковочным местам, индексированные по названию */
 const ixGraphicLines: Record<string, Line> = {

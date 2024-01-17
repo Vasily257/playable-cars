@@ -1,7 +1,7 @@
 import type * as PIXI from 'pixi.js';
 
 /** Опции ресурсов */
-export interface AssetOptions {
+export interface Asset {
   source: string;
   x: number;
   y: number;
