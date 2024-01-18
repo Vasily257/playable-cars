@@ -19,12 +19,17 @@ import './styles/index.css';
 /** Координаты якоря ресурсов */
 const ASSETS_ANCHOR_COORS = 0.5;
 
-/** Настройки анимации движения руки */
+/** Настройки анимации руки */
 const HAND_ANIMATION = {
   offsetX: 0.005,
   offsetY: 0.15,
   movementDuration: 1000,
   hidingDuration: 300,
+};
+
+/** Настройки анимации интерактивных машин */
+const CAR_ANIMATION = {
+  duration: 2000,
 };
 
 /** Конфигурация PIXI-приложения */
@@ -319,29 +324,68 @@ const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
   }
 };
 
+/** Переместить машины до своих парковочных мест */
+const moveCarsToParking = (): void => {
+  const interactiveCarAndParkingSprites = getInteractiveCarAndParkingSprites();
+
+  const tweens: Array<TWEEN.Tween<{ x: number; y: number }>> = [];
+
+  for (const [color, sprite] of Object.entries(
+    interactiveCarAndParkingSprites,
+  )) {
+    const points = ixLines[color as LineName].points;
+
+    const xPoints = points.map((point) => point.x);
+    const yPoints = points.map((point) => point.y);
+
+    const startPosition = { x: xPoints[0], y: yPoints[0] };
+
+    const tween = new TWEEN.Tween(startPosition)
+      .to({ x: xPoints, y: yPoints }, CAR_ANIMATION.duration)
+      .easing(TWEEN.Easing.Linear.None)
+      .onUpdate((currentPosition) => {
+        if (sprite.car !== null) {
+          sprite.car.position.set(currentPosition.x, currentPosition.y);
+        }
+      });
+
+    tweens.push(tween);
+  }
+
+  tweens.every((tween) => tween.start());
+};
+
 /** Обработать отпускание кнопки мыши */
 const handleMouseUp = (event: PIXI.FederatedMouseEvent): void => {
   const clickPoint = new PIXI.Point(event.pageX, event.pageY);
   const interactiveCarAndParkingSprites = getInteractiveCarAndParkingSprites();
 
-  for (const [carColor, sprite] of Object.entries(
+  for (const [color, sprite] of Object.entries(
     interactiveCarAndParkingSprites,
   )) {
     const isParkingClick = sprite.parking?.containsPoint(clickPoint) ?? false;
-    const lineColor = carColor as LineName;
+    const lineColor = color as LineName;
 
     ixLines[lineColor].isDrawing = false;
 
     if (isParkingClick) {
       ixLines[lineColor].isFinished = true;
 
-      // Убрать интерактивность у машин
+      // Убрать интерактивность у машины
       if (sprite.car !== null) {
         sprite.car.eventMode = 'none';
         sprite.car.cursor = 'auto';
       }
+
+      const isAllLinesFinished = Object.values(ixLines)
+        .map((line) => line.isFinished)
+        .every((value) => value);
+
+      if (isAllLinesFinished) {
+        moveCarsToParking();
+      }
     } else if (!ixLines[lineColor].isFinished) {
-      // Очистить линии
+      // Очистить линию
       ixLines[lineColor].graphics?.clear();
       ixLines[lineColor].points = [];
     }
