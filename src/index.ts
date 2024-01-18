@@ -229,26 +229,40 @@ const moveHandToRedParking = (): void => {
   }
 };
 
-/** Получить спрайты интерактивных машин, индексированные по цветам (именам линий) */
-const getInteractiveCarSprites = (): Record<LineName, PIXI.Sprite | null> => {
+/**
+ * Получить спрайты интерактивных машин и связанные парковочные места,
+ * индексированные по цветам (именам линий)
+ */
+const getInteractiveCarAndParkingSprites = (): Record<
+  LineName,
+  { car: PIXI.Sprite | null; parking: PIXI.Sprite | null }
+> => {
   return {
-    [LineName.Red]: ixAssets[AssetName.CarRed].sprite,
-    [LineName.Yellow]: ixAssets[AssetName.CarYellow].sprite,
+    [LineName.Red]: {
+      car: ixAssets[AssetName.CarRed].sprite,
+      parking: ixAssets[AssetName.ParkingMarkRed].sprite,
+    },
+    [LineName.Yellow]: {
+      car: ixAssets[AssetName.CarYellow].sprite,
+      parking: ixAssets[AssetName.ParkingMarkYellow].sprite,
+    },
   };
 };
 
 /** Обработать нажатие кнопки мыши */
 const handleMouseDown = (event: PIXI.FederatedMouseEvent): void => {
   const clickPoint = new PIXI.Point(event.pageX, event.pageY);
-  const interactiveCarSprites = getInteractiveCarSprites();
+  const interactiveCarAndParkingSprites = getInteractiveCarAndParkingSprites();
 
   // Определить машину, по которой кликнули,
   // и активировать линию соответствующего цвета
-  for (const [carColor, carSprite] of Object.entries(interactiveCarSprites)) {
-    const isCarClick = carSprite?.containsPoint(clickPoint) ?? false;
-    const lineColor = carColor as LineName;
+  for (const [color, sprite] of Object.entries(
+    interactiveCarAndParkingSprites,
+  )) {
+    const isCarClick = sprite.car?.containsPoint(clickPoint) ?? false;
+    const lineColor = color as LineName;
 
-    if (isCarClick) {
+    if (isCarClick && !ixLines[lineColor].isFinished) {
       ixLines[lineColor].isDrawing = true;
       ixLines[lineColor].points.push(clickPoint);
     }
@@ -306,12 +320,30 @@ const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
 };
 
 /** Обработать отпускание кнопки мыши */
-const handleMouseUp = (): void => {
-  for (const line of Object.values(ixLines)) {
-    if (line.isDrawing && line.graphics !== null) {
-      line.isDrawing = false;
-      line.graphics.clear();
-      line.points = [];
+const handleMouseUp = (event: PIXI.FederatedMouseEvent): void => {
+  const clickPoint = new PIXI.Point(event.pageX, event.pageY);
+  const interactiveCarAndParkingSprites = getInteractiveCarAndParkingSprites();
+
+  for (const [carColor, sprite] of Object.entries(
+    interactiveCarAndParkingSprites,
+  )) {
+    const isParkingClick = sprite.parking?.containsPoint(clickPoint) ?? false;
+    const lineColor = carColor as LineName;
+
+    ixLines[lineColor].isDrawing = false;
+
+    if (isParkingClick) {
+      ixLines[lineColor].isFinished = true;
+
+      // Убрать интерактивность у машин
+      if (sprite.car !== null) {
+        sprite.car.eventMode = 'none';
+        sprite.car.cursor = 'auto';
+      }
+    } else if (!ixLines[lineColor].isFinished) {
+      // Очистить линии
+      ixLines[lineColor].graphics?.clear();
+      ixLines[lineColor].points = [];
     }
   }
 };
