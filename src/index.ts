@@ -20,10 +20,11 @@ import './styles/index.css';
 const ASSETS_ANCHOR_COORS = 0.5;
 
 /** Настройки анимации движения руки */
-const HAND_MOVEMENT_ANIMATION = {
+const HAND_ANIMATION = {
   offsetX: 0.005,
   offsetY: 0.15,
-  duration: 1000,
+  movementDuration: 1000,
+  hidingDuration: 300,
 };
 
 /** Конфигурация PIXI-приложения */
@@ -141,18 +142,23 @@ const ixLines: Record<LineName, Line> = {
   [LineName.Red]: {
     size: 10,
     hexColor: 'D1191F',
-    isDrawn: false,
+    isDrawing: false,
+    isFinished: false,
     points: [],
     graphics: null,
   },
   [LineName.Yellow]: {
     size: 10,
     hexColor: 'FFC841',
-    isDrawn: false,
+    isDrawing: false,
+    isFinished: false,
     points: [],
     graphics: null,
   },
 };
+
+/** Скрыта ли рука-подсказка */
+let isHandHidden = false;
 
 /** Добавить canvas в DOM */
 const addAppToDOM = (): void => {
@@ -160,7 +166,7 @@ const addAppToDOM = (): void => {
 };
 
 /** Настроить ресурсы и добавить их на сцену */
-const configurteAssetsAndAddThemToStage = (): void => {
+const configureAssetsAndAddThemToStage = (): void => {
   for (const [key, assetOptions] of Object.entries(ixAssets)) {
     /** Спрайт на основе ресурса */
     const sprite = PIXI.Sprite.from(assetOptions.source);
@@ -198,7 +204,7 @@ const addLinesToStage = (): void => {
 const moveHandToRedParking = (): void => {
   const parkingMarkRed = ixAssets[AssetName.ParkingMarkRed];
 
-  const { offsetX, offsetY, duration } = HAND_MOVEMENT_ANIMATION;
+  const { offsetX, offsetY, movementDuration } = HAND_ANIMATION;
 
   const endX = app.screen.width * (parkingMarkRed?.x + offsetX);
   const endY = app.screen.height * (parkingMarkRed?.y + offsetY);
@@ -212,7 +218,7 @@ const moveHandToRedParking = (): void => {
           x: endX,
           y: endY,
         },
-        duration,
+        movementDuration,
       )
       .repeat(Infinity)
       .easing(TWEEN.Easing.Linear.None)
@@ -243,9 +249,30 @@ const handleMouseDown = (event: PIXI.FederatedMouseEvent): void => {
     const lineColor = carColor as LineName;
 
     if (isCarClick) {
-      ixLines[lineColor].isDrawn = true;
+      ixLines[lineColor].isDrawing = true;
       ixLines[lineColor].points.push(clickPoint);
     }
+  }
+};
+
+/** Плавно скрыть спрайт, а потом удалить его */
+const hideAndRemoveHand = (): void => {
+  const handSprite = ixAssets[AssetName.Hand].sprite;
+
+  if (handSprite !== null) {
+    new TWEEN.Tween(handSprite)
+      .to(
+        {
+          alpha: 0,
+        },
+        HAND_ANIMATION.hidingDuration,
+      )
+      .onComplete(() => {
+        app.stage.removeChild(handSprite);
+
+        ixAssets[AssetName.Hand].sprite = null;
+      })
+      .start();
   }
 };
 
@@ -255,7 +282,13 @@ const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
 
   // Перебрать существующие линии
   for (const line of Object.values(ixLines)) {
-    if (line.isDrawn && line.graphics !== null) {
+    if (line.isDrawing && line.graphics !== null) {
+      if (!isHandHidden) {
+        hideAndRemoveHand();
+
+        isHandHidden = true;
+      }
+
       // Добавить новую точку и определить стиль линии
       line.points.push(currentPosition);
       line.graphics.lineStyle(line.size, line.hexColor);
@@ -275,8 +308,8 @@ const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
 /** Обработать отпускание кнопки мыши */
 const handleMouseUp = (): void => {
   for (const line of Object.values(ixLines)) {
-    if (line.isDrawn && line.graphics !== null) {
-      line.isDrawn = false;
+    if (line.isDrawing && line.graphics !== null) {
+      line.isDrawing = false;
       line.graphics.clear();
       line.points = [];
     }
@@ -301,7 +334,7 @@ const resizeApp = (): void => {
 
 // Инициализировать приложение
 addAppToDOM();
-configurteAssetsAndAddThemToStage();
+configureAssetsAndAddThemToStage();
 addLinesToStage();
 moveHandToRedParking();
 

@@ -31,7 +31,8 @@ export enum AssetName {
 export interface Line {
   size: number;
   hexColor: string;
-  isDrawn: boolean;
+  isDrawing: boolean;
+  isFinished: boolean;
   points: PIXI.Point[];
   graphics: PIXI.Graphics | null;
 }
