@@ -178,7 +178,7 @@ const configureAssetsAndAddThemToStage = (): void => {
 
     // Добавить курсор-поинтер для интерактивных ресурсов
     if (key === AssetName.CarRed || key === AssetName.CarYellow) {
-      sprite.interactive = true;
+      sprite.eventMode = 'static';
       sprite.cursor = 'pointer';
     }
 
