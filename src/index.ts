@@ -13,7 +13,6 @@ import {
   type LineName,
   type CarAndParkingSprites,
   type FlatTween,
-  type GraphicOption,
 } from './types';
 
 import './styles/index.css';
@@ -151,9 +150,7 @@ const disableInteractivity = (sprite: PIXI.Sprite): void => {
 };
 
 /** Проверить, нарисованы ли все линии */
-const checkLinesFinality = (
-  ixGraphics: Record<LineName, GraphicOption>,
-): boolean => {
+const isAllLinesFinished = (): boolean => {
   const isAllLinesFinished = Object.values(ixGraphics)
     .map((graphic) => graphic.isFinished)
     .every((value) => value);
@@ -161,15 +158,49 @@ const checkLinesFinality = (
   return isAllLinesFinished;
 };
 
-/** Переместить машины до своих парковочных мест */
-const moveCarsToParking = (): void => {
+/** Найти индексы точек, где будет столкновение, для обоих линий */
+const getCrashPointIndexes = (): Record<LineName, number> => {
+  const redPoints = ixGraphics.red.points;
+  const yellowPoints = ixGraphics.yellow.points;
+
+  let redCrashIndex = 0;
+  let yellowCrashIndex = 0;
+
+  for (let i = 0; i < redPoints.length; i += 1) {
+    const redPoint = redPoints[i];
+
+    // Определить точку, когда красная линия пересечёт желтую,
+    // а затем определить её индекс
+    yellowCrashIndex = yellowPoints.findIndex((yellowPoint) => {
+      return yellowPoint.x < redPoint.x && yellowPoint.y > redPoint.y;
+    });
+
+    // Если желтая точка найдена, то сохранить индекс связанной красной точки
+    if (yellowCrashIndex > -1) {
+      redCrashIndex = i;
+
+      break;
+    }
+  }
+
+  return { red: redCrashIndex, yellow: yellowCrashIndex };
+};
+
+/** Переместить машины до своих парковочных мест
+ * @param crashIndexes индексы точек, где произойдёт столкновение
+ */
+const moveCarsToPakring = (crashIndexes: Record<LineName, number>): void => {
   const tweens: FlatTween[] = [];
   const ixSprites = interactiveCarAndParkingSprites;
 
   for (const [name, sprite] of Object.entries(ixSprites)) {
-    const points = ixGraphics[name as LineName].points;
+    const lineName = name as LineName;
 
-    // Получить массивы координат отдельно по осям
+    // Отсечь точки после точки столкновения
+    const crashIndex = crashIndexes[lineName];
+    const points = ixGraphics[lineName].points.slice(0, crashIndex);
+
+    // Получить координаты точек по отдельным осям
     const xPoints = points.map((point) => point.x);
     const yPoints = points.map((point) => point.y);
 
@@ -206,10 +237,10 @@ const handleMouseUp = (event: PIXI.FederatedMouseEvent): void => {
 
       disableInteractivity(sprite.car);
 
-      const isAllLinesFinished = checkLinesFinality(ixGraphics);
+      if (isAllLinesFinished()) {
+        const crashPointIndexes = getCrashPointIndexes();
 
-      if (isAllLinesFinished) {
-        moveCarsToParking();
+        moveCarsToPakring(crashPointIndexes);
       }
     } else if (!ixGraphics[lineName].isFinished) {
       // Очистить линию
