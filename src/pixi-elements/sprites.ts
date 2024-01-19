@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import * as PIXI from 'pixi.js';
 
-import { ASSETS_ANCHOR_COORS, ASSETS_OPTIONS } from '../constants';
+import { CENTERED_SPRITE_COOR, ASSETS_OPTIONS } from '../constants';
 import { type AssetName } from '../types';
 
 /** Инициализировать спрайты */
@@ -14,9 +14,13 @@ const initSprites = (app: PIXI.Application): Record<AssetName, PIXI.Sprite> => {
     ixSprites[spriteName] = PIXI.Sprite.from(options.source);
 
     // Задать начальное положение
-    ixSprites[spriteName].anchor.set(ASSETS_ANCHOR_COORS);
     ixSprites[spriteName].x = app.screen.width * options.x;
     ixSprites[spriteName].y = app.screen.height * options.y;
+
+    // Отцентрировать начало координат для всех спрайтов, кроме руки
+    if (spriteName !== 'hand') {
+      ixSprites[spriteName].anchor.set(CENTERED_SPRITE_COOR);
+    }
 
     // Добавить курсор-поинтер для интерактивных спрайтов
     if (spriteName === 'redCar' || spriteName === 'yellowCar') {

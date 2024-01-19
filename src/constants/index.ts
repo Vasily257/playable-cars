@@ -18,16 +18,14 @@ import gameLogoPng from '../assets/game-logo.png';
 import playNowPng from '../assets/play-now.png';
 import failPng from '../assets/fail.png';
 
-/** Координаты якоря ресурсов */
-const ASSETS_ANCHOR_COORS = 0.5;
+/** Координата для центрирования начала спрайта */
+const CENTERED_SPRITE_COOR = 0.5;
 
 /** Настройки анимации */
 const ANIMATION = {
   hand: {
-    offsetX: 0.005,
-    offsetY: 0.15,
     duration: {
-      movement: 1000,
+      movement: 1250,
       hiding: 300,
     },
   },
@@ -72,8 +70,8 @@ const ASSETS_OPTIONS: Record<AssetName, AssetOption> = {
     source: carYellowPng,
   },
   hand: {
-    x: 0.475,
-    y: 0.525,
+    x: 0.295,
+    y: 0.555,
     source: handPng,
   },
   parkingLine1: {
@@ -141,7 +139,7 @@ const LINE_OPTIONS: Record<LineName, LineOption> = {
 };
 
 export {
-  ASSETS_ANCHOR_COORS,
+  CENTERED_SPRITE_COOR,
   ANIMATION,
   PIXI_CONFIG,
   ASSETS_OPTIONS,

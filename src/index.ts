@@ -66,14 +66,13 @@ const addGraphicToStage = (): void => {
 /** Перемещать руку до красной парковки */
 const moveHandToRedParking = (): void => {
   const { x, y } = ASSETS_OPTIONS.redParking;
-  const { offsetX, offsetY, duration } = ANIMATION.hand;
 
-  const endX = app.screen.width * (x + offsetX);
-  const endY = app.screen.height * (y + offsetY);
+  const endX = app.screen.width * x;
+  const endY = app.screen.height * y;
 
   // Инициализировать и запустить анимацию
   new TWEEN.Tween(ixSprites.hand.position)
-    .to({ x: endX, y: endY }, duration.movement)
+    .to({ x: endX, y: endY }, ANIMATION.hand.duration.movement)
     .repeat(Infinity)
     .easing(TWEEN.Easing.Linear.None)
     .start();
