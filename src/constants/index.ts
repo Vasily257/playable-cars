@@ -1,7 +1,7 @@
 import type * as PIXI from 'pixi.js';
 import {
-  AssetName,
-  LineName,
+  type AssetName,
+  type LineName,
   type AssetOption,
   type LineOption,
 } from '../types';
@@ -51,77 +51,77 @@ const PIXI_CONFIG: Partial<PIXI.IApplicationOptions> = {
 
 /** Начальные позиции ресурсов и их источники */
 const ASSETS_OPTIONS: Record<AssetName, AssetOption> = {
-  [AssetName.CarGreen]: {
+  greenCar: {
     x: 0.195,
     y: 0.21,
     source: carGreenPng,
   },
-  [AssetName.CarBlue]: {
+  blueCar: {
     x: 0.795,
     y: 0.21,
     source: carBluePng,
   },
-  [AssetName.CarRed]: {
+  redCar: {
     x: 0.295,
     y: 0.555,
     source: carRedPng,
   },
-  [AssetName.CarYellow]: {
+  yellowCar: {
     x: 0.7,
     y: 0.555,
     source: carYellowPng,
   },
-  [AssetName.Hand]: {
+  hand: {
     x: 0.475,
     y: 0.525,
     source: handPng,
   },
-  [AssetName.ParkingLine1]: {
+  parkingLine1: {
     x: 0.905,
     y: 0.025,
     source: parkingLinePng,
   },
-  [AssetName.ParkingLine2]: {
+  parkingLine2: {
     x: 0.702,
     y: 0.025,
     source: parkingLinePng,
   },
-  [AssetName.ParkingLine3]: {
+  parkingLine3: {
     x: 0.499,
     y: 0.025,
     source: parkingLinePng,
   },
-  [AssetName.ParkingLine4]: {
+  parkingLine4: {
     x: 0.293,
     y: 0.025,
     source: parkingLinePng,
   },
-  [AssetName.ParkingLine5]: {
+  parkingLine5: {
     x: 0.09,
     y: 0.025,
     source: parkingLinePng,
   },
-  [AssetName.ParkingYellow]: {
+  yellowParking: {
     x: 0.394,
     y: 0.183,
     source: parkingYellowPng,
   },
-  [AssetName.ParkingRed]: {
+  redParking: {
     x: 0.609,
     y: 0.183,
     source: parkingRedPng,
   },
-  [AssetName.GameLogo]: {
+  gameLogo: {
     x: 2,
     y: 2,
     source: gameLogoPng,
   },
-  [AssetName.PlayNow]: {
+  playNow: {
     x: 2,
     y: 2,
     source: playNowPng,
   },
-  [AssetName.Fail]: {
+  fail: {
     x: 2,
     y: 2,
     source: failPng,
@@ -130,11 +130,11 @@ const ASSETS_OPTIONS: Record<AssetName, AssetOption> = {
 
 /** Размер и цвет линий */
 const LINE_OPTIONS: Record<LineName, LineOption> = {
-  [LineName.Red]: {
+  red: {
     size: 10,
     hexColor: 'D1191F',
   },
-  [LineName.Yellow]: {
+  yellow: {
     size: 10,
     hexColor: 'FFC841',
   },

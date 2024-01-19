@@ -9,8 +9,8 @@ import {
   LINE_OPTIONS,
 } from './constants';
 import {
-  AssetName,
-  LineName,
+  type AssetName,
+  type LineName,
   type CarAndParkingSprites,
   type FlatTween,
   type GraphicOption,
@@ -32,13 +32,13 @@ const ixGraphics = initGraphics();
  * индексированные по названию линий
  */
 const interactiveCarAndParkingSprites: CarAndParkingSprites = {
-  [LineName.Red]: {
-    car: ixSprites[AssetName.CarRed],
-    parking: ixSprites[AssetName.ParkingRed],
+  red: {
+    car: ixSprites.redCar,
+    parking: ixSprites.redParking,
   },
-  [LineName.Yellow]: {
-    car: ixSprites[AssetName.CarYellow],
-    parking: ixSprites[AssetName.ParkingYellow],
+  yellow: {
+    car: ixSprites.yellowCar,
+    parking: ixSprites.yellowParking,
   },
 };
 
@@ -66,14 +66,14 @@ const addGraphicToStage = (): void => {
 
 /** Перемещать руку до красной парковки */
 const moveHandToRedParking = (): void => {
-  const { x, y } = ASSETS_OPTIONS[AssetName.ParkingRed];
+  const { x, y } = ASSETS_OPTIONS.redParking;
   const { offsetX, offsetY, duration } = ANIMATION.hand;
 
   const endX = app.screen.width * (x + offsetX);
   const endY = app.screen.height * (y + offsetY);
 
   // Инициализировать и запустить анимацию
-  new TWEEN.Tween(ixSprites[AssetName.Hand].position)
+  new TWEEN.Tween(ixSprites.hand.position)
     .to({ x: endX, y: endY }, duration.movement)
     .repeat(Infinity)
     .easing(TWEEN.Easing.Linear.None)
@@ -100,7 +100,7 @@ const handleMouseDown = (event: PIXI.FederatedMouseEvent): void => {
 
 /** Плавно скрыть руку и удалить её */
 const hideAndRemoveHand = (): void => {
-  const handSprite = ixSprites[AssetName.Hand];
+  const handSprite = ixSprites.hand;
 
   // Инициализировать и запустить анимацию
   new TWEEN.Tween(handSprite)

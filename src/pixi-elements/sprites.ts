@@ -2,7 +2,7 @@
 import * as PIXI from 'pixi.js';
 
 import { ASSETS_ANCHOR_COORS, ASSETS_OPTIONS } from '../constants';
-import { AssetName } from '../types';
+import { type AssetName } from '../types';
 
 /** Инициализировать спрайты */
 const initSprites = (app: PIXI.Application): Record<AssetName, PIXI.Sprite> => {
@@ -19,7 +19,7 @@ const initSprites = (app: PIXI.Application): Record<AssetName, PIXI.Sprite> => {
     ixSprites[spriteName].y = app.screen.height * options.y;
 
     // Добавить курсор-поинтер для интерактивных спрайтов
-    if (spriteName === AssetName.CarRed || name === AssetName.CarYellow) {
+    if (spriteName === 'redCar' || spriteName === 'yellowCar') {
       ixSprites[spriteName].eventMode = 'static';
       ixSprites[spriteName].cursor = 'pointer';
     }
