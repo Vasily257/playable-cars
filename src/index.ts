@@ -20,6 +20,9 @@ import './styles/index.css';
 /** PIXI-приложение */
 const app = new PIXI.Application<HTMLCanvasElement>(PIXI_CONFIG);
 
+/** Базовый контейнер приложения */
+const container = new PIXI.Container();
+
 /** Спрайты, индексированные по названию ресурсов */
 const ixSprites = initSprites(app);
 
@@ -49,17 +52,24 @@ const addAppToDOM = (): void => {
   document.body.appendChild(app.view);
 };
 
-/** Добавить спрайты на сцену */
-const addSpritesToStage = (): void => {
+/** Добавить базовый контейнер в приложение */
+const addBaseContainerToApp = (): void => {
+  app.stage.addChild(container);
+
+  container.sortableChildren = true;
+};
+
+/** Добавить спрайты в базовый контейнер */
+const addSpritesToBaseContainer = (): void => {
   for (const sprite of Object.values(ixSprites)) {
-    app.stage.addChild(sprite);
+    container.addChild(sprite);
   }
 };
 
-/** Добавить линии на сцену */
-const addGraphicToStage = (): void => {
+/** Добавить линии в базовый контейнер */
+const addGraphicToBaseContainer = (): void => {
   for (const graphic of Object.values(ixGraphics)) {
-    app.stage.addChild(graphic.pixi);
+    container.addChild(graphic.pixi);
   }
 };
 
@@ -127,8 +137,9 @@ const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
       graphic.points.push(currentPosition);
 
       // Задать стиль графики
-      const { size, hexColor } = LINE_OPTIONS[linename];
+      const { size, hexColor, z } = LINE_OPTIONS[linename];
       graphic.pixi.lineStyle(size, hexColor);
+      graphic.pixi.zIndex = z;
 
       // Построить линию по точкам
       for (let i = 1; i < graphic.points.length; i += 1) {
@@ -268,8 +279,9 @@ const resizeApp = (): void => {
 
 // Инициализировать приложение
 addAppToDOM();
-addSpritesToStage();
-addGraphicToStage();
+addBaseContainerToApp();
+addSpritesToBaseContainer();
+addGraphicToBaseContainer();
 moveHandToRedParking();
 
 // Запустить анимацию

@@ -16,6 +16,7 @@ const initSprites = (app: PIXI.Application): Record<AssetName, PIXI.Sprite> => {
     // Задать начальное положение
     ixSprites[spriteName].x = app.screen.width * options.x;
     ixSprites[spriteName].y = app.screen.height * options.y;
+    ixSprites[spriteName].zIndex = options.z;
 
     // Отцентрировать начало координат для всех спрайтов, кроме руки
     if (spriteName !== 'hand') {

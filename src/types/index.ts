@@ -26,12 +26,13 @@ export type AssetName =
   | 'fail';
 
 /** Опции ресурса */
-export type AssetOption = Coors & { source: string };
+export type AssetOption = Coors & { z: number; source: string };
 
 /** Линия */
 export interface LineOption {
   size: number;
   hexColor: string;
+  z: number;
 }
 
 /** Названия линий */

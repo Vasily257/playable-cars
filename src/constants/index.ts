@@ -52,76 +52,91 @@ const ASSETS_OPTIONS: Record<AssetName, AssetOption> = {
   greenCar: {
     x: 0.195,
     y: 0.21,
+    z: 2,
     source: carGreenPng,
   },
   blueCar: {
     x: 0.795,
     y: 0.21,
+    z: 2,
     source: carBluePng,
   },
   redCar: {
     x: 0.295,
     y: 0.555,
+    z: 2,
     source: carRedPng,
   },
   yellowCar: {
     x: 0.7,
     y: 0.555,
+    z: 2,
     source: carYellowPng,
   },
   hand: {
     x: 0.295,
     y: 0.555,
+    z: 3,
     source: handPng,
   },
   parkingLine1: {
     x: 0.905,
     y: 0.025,
+    z: 1,
     source: parkingLinePng,
   },
   parkingLine2: {
     x: 0.702,
     y: 0.025,
+    z: 1,
     source: parkingLinePng,
   },
   parkingLine3: {
     x: 0.499,
     y: 0.025,
+    z: 1,
     source: parkingLinePng,
   },
   parkingLine4: {
     x: 0.293,
     y: 0.025,
+    z: 1,
     source: parkingLinePng,
   },
   parkingLine5: {
     x: 0.09,
     y: 0.025,
+    z: 1,
     source: parkingLinePng,
   },
   yellowParking: {
     x: 0.394,
     y: 0.183,
+    z: 1,
     source: parkingYellowPng,
   },
   redParking: {
     x: 0.609,
     y: 0.183,
+    z: 1,
     source: parkingRedPng,
   },
   gameLogo: {
     x: 2,
     y: 2,
+    z: 4,
     source: gameLogoPng,
   },
   playNow: {
     x: 2,
     y: 2,
+    z: 4,
     source: playNowPng,
   },
   fail: {
     x: 2,
     y: 2,
+    z: 4,
     source: failPng,
   },
 };
@@ -131,10 +146,12 @@ const LINE_OPTIONS: Record<LineName, LineOption> = {
   red: {
     size: 10,
     hexColor: 'D1191F',
+    z: 2,
   },
   yellow: {
     size: 10,
     hexColor: 'FFC841',
+    z: 2,
   },
 };
 
