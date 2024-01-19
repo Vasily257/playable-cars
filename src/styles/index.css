@@ -1,6 +1,8 @@
 @import url(./normalize.css);
 
 canvas {
+  box-sizing: border-box;
+  border: 5px solid #ffb600;
   position: fixed;
   top: 0;
   left: 0;
