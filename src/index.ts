@@ -1,393 +1,220 @@
 import * as PIXI from 'pixi.js';
 import * as TWEEN from '@tweenjs/tween.js';
 
-import carBluePng from './assets/car-blue.png';
-import carRedPng from './assets/car-red.png';
-import carGreenPng from './assets/car-green.png';
-import carYellowPng from './assets/car-yellow.png';
-import handPng from './assets/hand.png';
-import parkingLinePng from './assets/parking-line.png';
-import parkingMarkRedPng from './assets/parking-mark-red.png';
-import parkingMarkYellowPng from './assets/parking-mark-yellow.png';
-import gameLogoPng from './assets/game-logo.png';
-import playNowPng from './assets/play-now.png';
-import failPng from './assets/fail.png';
+import { initSprites, initGraphics } from './pixi-elements';
+import {
+  PIXI_CONFIG,
+  ANIMATION,
+  ASSETS_OPTIONS,
+  LINE_OPTIONS,
+} from './constants';
+import {
+  AssetName,
+  LineName,
+  type CarAndParkingSprites,
+  type FlatTween,
+  type GraphicOption,
+} from './types';
 
-import { AssetName, LineName, type Asset, type Line } from './types/types';
 import './styles/index.css';
-
-/** Координаты якоря ресурсов */
-const ASSETS_ANCHOR_COORS = 0.5;
-
-/** Настройки анимации руки */
-const HAND_ANIMATION = {
-  offsetX: 0.005,
-  offsetY: 0.15,
-  movementDuration: 1000,
-  hidingDuration: 300,
-};
-
-/** Настройки анимации интерактивных машин */
-const CAR_ANIMATION = {
-  duration: 2000,
-};
-
-/** Конфигурация PIXI-приложения */
-const PIXI_CONFIG: Partial<PIXI.IApplicationOptions> = {
-  background: '#545454',
-  resizeTo: window,
-  eventMode: 'passive',
-  eventFeatures: {
-    move: true,
-    globalMove: false,
-    click: true,
-    wheel: true,
-  },
-};
 
 /** PIXI-приложение */
 const app = new PIXI.Application<HTMLCanvasElement>(PIXI_CONFIG);
 
-/** Ресурсы, индексированные по названию */
-const ixAssets: Record<AssetName, Asset> = {
-  [AssetName.CarGreen]: {
-    source: carGreenPng,
-    x: 0.195,
-    y: 0.21,
-    sprite: null,
-  },
-  [AssetName.CarBlue]: {
-    source: carBluePng,
-    x: 0.795,
-    y: 0.21,
-    sprite: null,
-  },
-  [AssetName.CarRed]: {
-    source: carRedPng,
-    x: 0.295,
-    y: 0.555,
-    sprite: null,
-  },
-  [AssetName.CarYellow]: {
-    source: carYellowPng,
-    x: 0.7,
-    y: 0.555,
-    sprite: null,
-  },
-  [AssetName.Hand]: {
-    source: handPng,
-    x: 0.475,
-    y: 0.525,
-    sprite: null,
-  },
-  [AssetName.ParkingLine1]: {
-    source: parkingLinePng,
-    x: 0.905,
-    y: 0.025,
-    sprite: null,
-  },
-  [AssetName.ParkingLine2]: {
-    source: parkingLinePng,
-    x: 0.702,
-    y: 0.025,
-    sprite: null,
-  },
-  [AssetName.ParkingLine3]: {
-    source: parkingLinePng,
-    x: 0.499,
-    y: 0.025,
-    sprite: null,
-  },
-  [AssetName.ParkingLine4]: {
-    source: parkingLinePng,
-    x: 0.293,
-    y: 0.025,
-    sprite: null,
-  },
-  [AssetName.ParkingLine5]: {
-    source: parkingLinePng,
-    x: 0.09,
-    y: 0.025,
-    sprite: null,
-  },
-  [AssetName.ParkingMarkYellow]: {
-    source: parkingMarkYellowPng,
-    x: 0.394,
-    y: 0.183,
-    sprite: null,
-  },
-  [AssetName.ParkingMarkRed]: {
-    source: parkingMarkRedPng,
-    x: 0.609,
-    y: 0.183,
-    sprite: null,
-  },
-  [AssetName.GameLogo]: {
-    source: gameLogoPng,
-    x: 2,
-    y: 2,
-    sprite: null,
-  },
-  [AssetName.PlayNow]: {
-    source: playNowPng,
-    x: 2,
-    y: 2,
-    sprite: null,
-  },
-  [AssetName.Fail]: {
-    source: failPng,
-    x: 2,
-    y: 2,
-    sprite: null,
-  },
-};
+/** Спрайты, индексированные по названию ресурсов */
+const ixSprites = initSprites(app);
 
-/** Линии от машин к парковочным местам, индексированные по названию */
-const ixLines: Record<LineName, Line> = {
+/** Линии к парковочным местам, индексированные по названию линий */
+const ixGraphics = initGraphics();
+
+/**
+ * Cпрайты интерактивных машин и связанных парковочных мест,
+ * индексированные по названию линий
+ */
+const interactiveCarAndParkingSprites: CarAndParkingSprites = {
   [LineName.Red]: {
-    size: 10,
-    hexColor: 'D1191F',
-    isDrawing: false,
-    isFinished: false,
-    points: [],
-    graphics: null,
+    car: ixSprites[AssetName.CarRed],
+    parking: ixSprites[AssetName.ParkingRed],
   },
   [LineName.Yellow]: {
-    size: 10,
-    hexColor: 'FFC841',
-    isDrawing: false,
-    isFinished: false,
-    points: [],
-    graphics: null,
+    car: ixSprites[AssetName.CarYellow],
+    parking: ixSprites[AssetName.ParkingYellow],
   },
 };
 
 /** Скрыта ли рука-подсказка */
 let isHandHidden = false;
 
-/** Добавить canvas в DOM */
+/** Добавить canvas приложения в DOM */
 const addAppToDOM = (): void => {
   document.body.appendChild(app.view);
 };
 
-/** Настроить ресурсы и добавить их на сцену */
-const configureAssetsAndAddThemToStage = (): void => {
-  for (const [key, assetOptions] of Object.entries(ixAssets)) {
-    /** Спрайт на основе ресурса */
-    const sprite = PIXI.Sprite.from(assetOptions.source);
-
-    // Задать начальное положение спрайта
-    sprite.anchor.set(ASSETS_ANCHOR_COORS);
-    sprite.x = app.screen.width * assetOptions.x;
-    sprite.y = app.screen.height * assetOptions.y;
-
-    // Добавить курсор-поинтер для интерактивных ресурсов
-    if (key === AssetName.CarRed || key === AssetName.CarYellow) {
-      sprite.eventMode = 'static';
-      sprite.cursor = 'pointer';
-    }
-
-    // Добавить спрайт на сцену
+/** Добавить спрайты на сцену */
+const addSpritesToStage = (): void => {
+  for (const sprite of Object.values(ixSprites)) {
     app.stage.addChild(sprite);
-
-    // Сохранить ссылку на спрайт
-    ixAssets[key as AssetName].sprite = sprite;
   }
 };
 
-/** Добавить пустые линии на сцену приложения */
-const addLinesToStage = (): void => {
-  for (const key of Object.keys(ixLines)) {
-    const graphics = new PIXI.Graphics();
-    ixLines[key as LineName].graphics = graphics;
-
-    app.stage.addChild(graphics);
+/** Добавить линии на сцену */
+const addGraphicToStage = (): void => {
+  for (const graphic of Object.values(ixGraphics)) {
+    app.stage.addChild(graphic.pixi);
   }
 };
 
-/** Переместить указатель (руку) до цели (красной парковки) */
+/** Перемещать руку до красной парковки */
 const moveHandToRedParking = (): void => {
-  const parkingMarkRed = ixAssets[AssetName.ParkingMarkRed];
+  const { x, y } = ASSETS_OPTIONS[AssetName.ParkingRed];
+  const { offsetX, offsetY, duration } = ANIMATION.hand;
 
-  const { offsetX, offsetY, movementDuration } = HAND_ANIMATION;
+  const endX = app.screen.width * (x + offsetX);
+  const endY = app.screen.height * (y + offsetY);
 
-  const endX = app.screen.width * (parkingMarkRed?.x + offsetX);
-  const endY = app.screen.height * (parkingMarkRed?.y + offsetY);
-
-  const handSprite = ixAssets[AssetName.Hand].sprite;
-
-  if (handSprite !== null) {
-    new TWEEN.Tween(handSprite)
-      .to(
-        {
-          x: endX,
-          y: endY,
-        },
-        movementDuration,
-      )
-      .repeat(Infinity)
-      .easing(TWEEN.Easing.Linear.None)
-      .onComplete(() => {
-        console.log('Анимация завершена!');
-      })
-      .start();
-  }
-};
-
-/**
- * Получить спрайты интерактивных машин и связанные парковочные места,
- * индексированные по цветам (именам линий)
- */
-const getInteractiveCarAndParkingSprites = (): Record<
-  LineName,
-  { car: PIXI.Sprite | null; parking: PIXI.Sprite | null }
-> => {
-  return {
-    [LineName.Red]: {
-      car: ixAssets[AssetName.CarRed].sprite,
-      parking: ixAssets[AssetName.ParkingMarkRed].sprite,
-    },
-    [LineName.Yellow]: {
-      car: ixAssets[AssetName.CarYellow].sprite,
-      parking: ixAssets[AssetName.ParkingMarkYellow].sprite,
-    },
-  };
+  // Инициализировать и запустить анимацию
+  new TWEEN.Tween(ixSprites[AssetName.Hand].position)
+    .to({ x: endX, y: endY }, duration.movement)
+    .repeat(Infinity)
+    .easing(TWEEN.Easing.Linear.None)
+    .start();
 };
 
 /** Обработать нажатие кнопки мыши */
 const handleMouseDown = (event: PIXI.FederatedMouseEvent): void => {
-  const clickPoint = new PIXI.Point(event.pageX, event.pageY);
-  const interactiveCarAndParkingSprites = getInteractiveCarAndParkingSprites();
+  const currentPosition = new PIXI.Point(event.pageX, event.pageY);
+  const ixSprites = interactiveCarAndParkingSprites;
 
-  // Определить машину, по которой кликнули,
-  // и активировать линию соответствующего цвета
-  for (const [color, sprite] of Object.entries(
-    interactiveCarAndParkingSprites,
-  )) {
-    const isCarClick = sprite.car?.containsPoint(clickPoint) ?? false;
-    const lineColor = color as LineName;
+  // Определить машину, по которой кликнули, и активировать соответствующую линию
+  for (const [name, sprite] of Object.entries(ixSprites)) {
+    const isCarClick = sprite.car.containsPoint(currentPosition);
+    const lineName = name as LineName;
 
-    if (isCarClick && !ixLines[lineColor].isFinished) {
-      ixLines[lineColor].isDrawing = true;
-      ixLines[lineColor].points.push(clickPoint);
+    // Начать рисование и добавить первую точку
+    if (isCarClick && !ixGraphics[lineName].isFinished) {
+      ixGraphics[lineName].isDrawing = true;
+      ixGraphics[lineName].points.push(currentPosition);
     }
   }
 };
 
-/** Плавно скрыть спрайт, а потом удалить его */
+/** Плавно скрыть руку и удалить её */
 const hideAndRemoveHand = (): void => {
-  const handSprite = ixAssets[AssetName.Hand].sprite;
+  const handSprite = ixSprites[AssetName.Hand];
 
-  if (handSprite !== null) {
-    new TWEEN.Tween(handSprite)
-      .to(
-        {
-          alpha: 0,
-        },
-        HAND_ANIMATION.hidingDuration,
-      )
-      .onComplete(() => {
-        app.stage.removeChild(handSprite);
+  // Инициализировать и запустить анимацию
+  new TWEEN.Tween(handSprite)
+    .to({ alpha: 0 }, ANIMATION.hand.duration.hiding)
+    .easing(TWEEN.Easing.Linear.None)
+    .onComplete(() => app.stage.removeChild(handSprite))
+    .start();
 
-        ixAssets[AssetName.Hand].sprite = null;
-      })
-      .start();
-  }
+  isHandHidden = true;
 };
 
 /** Обработать перемещение курсора */
 const handleMouseMove = (event: PIXI.FederatedMouseEvent): void => {
   const currentPosition = new PIXI.Point(event.pageX, event.pageY);
 
-  // Перебрать существующие линии
-  for (const line of Object.values(ixLines)) {
-    if (line.isDrawing && line.graphics !== null) {
+  for (const [name, graphic] of Object.entries(ixGraphics)) {
+    const linename = name as LineName;
+
+    if (graphic.isDrawing) {
+      // Скрыть руку
       if (!isHandHidden) {
         hideAndRemoveHand();
-
-        isHandHidden = true;
       }
 
-      // Добавить новую точку и определить стиль линии
-      line.points.push(currentPosition);
-      line.graphics.lineStyle(line.size, line.hexColor);
+      // Добавить новую точку
+      graphic.points.push(currentPosition);
+
+      // Задать стиль графики
+      const { size, hexColor } = LINE_OPTIONS[linename];
+      graphic.pixi.lineStyle(size, hexColor);
 
       // Построить линию по точкам
-      for (let i = 1; i < line.points.length; i++) {
-        const startPoint = line.points[i - 1];
-        const endPoint = line.points[i];
+      for (let i = 1; i < graphic.points.length; i += 1) {
+        const startPoint = graphic.points[i - 1];
+        const endPoint = graphic.points[i];
 
-        line.graphics.moveTo(startPoint.x, startPoint.y);
-        line.graphics.lineTo(endPoint.x, endPoint.y);
+        graphic.pixi.moveTo(startPoint.x, startPoint.y);
+        graphic.pixi.lineTo(endPoint.x, endPoint.y);
       }
     }
   }
 };
 
+/** Отключить интерактивность */
+const disableInteractivity = (sprite: PIXI.Sprite): void => {
+  sprite.eventMode = 'none';
+  sprite.cursor = 'auto';
+};
+
+/** Проверить, нарисованы ли все линии */
+const checkLinesFinality = (
+  ixGraphics: Record<LineName, GraphicOption>,
+): boolean => {
+  const isAllLinesFinished = Object.values(ixGraphics)
+    .map((graphic) => graphic.isFinished)
+    .every((value) => value);
+
+  return isAllLinesFinished;
+};
+
 /** Переместить машины до своих парковочных мест */
 const moveCarsToParking = (): void => {
-  const interactiveCarAndParkingSprites = getInteractiveCarAndParkingSprites();
+  const tweens: FlatTween[] = [];
+  const ixSprites = interactiveCarAndParkingSprites;
 
-  const tweens: Array<TWEEN.Tween<{ x: number; y: number }>> = [];
+  for (const [name, sprite] of Object.entries(ixSprites)) {
+    const points = ixGraphics[name as LineName].points;
 
-  for (const [color, sprite] of Object.entries(
-    interactiveCarAndParkingSprites,
-  )) {
-    const points = ixLines[color as LineName].points;
-
+    // Получить массивы координат отдельно по осям
     const xPoints = points.map((point) => point.x);
     const yPoints = points.map((point) => point.y);
 
     const startPosition = { x: xPoints[0], y: yPoints[0] };
 
+    // Инициализировать анимацию
     const tween = new TWEEN.Tween(startPosition)
-      .to({ x: xPoints, y: yPoints }, CAR_ANIMATION.duration)
+      .to({ x: xPoints, y: yPoints }, ANIMATION.car.duration)
       .easing(TWEEN.Easing.Linear.None)
       .onUpdate((currentPosition) => {
-        if (sprite.car !== null) {
-          sprite.car.position.set(currentPosition.x, currentPosition.y);
-        }
+        sprite.car.position.set(currentPosition.x, currentPosition.y);
       });
 
     tweens.push(tween);
   }
 
+  // Запустить анимации
   tweens.every((tween) => tween.start());
 };
 
 /** Обработать отпускание кнопки мыши */
 const handleMouseUp = (event: PIXI.FederatedMouseEvent): void => {
-  const clickPoint = new PIXI.Point(event.pageX, event.pageY);
-  const interactiveCarAndParkingSprites = getInteractiveCarAndParkingSprites();
+  const currentPosition = new PIXI.Point(event.pageX, event.pageY);
+  const ixSprites = interactiveCarAndParkingSprites;
 
-  for (const [color, sprite] of Object.entries(
-    interactiveCarAndParkingSprites,
-  )) {
-    const isParkingClick = sprite.parking?.containsPoint(clickPoint) ?? false;
-    const lineColor = color as LineName;
+  for (const [name, sprite] of Object.entries(ixSprites)) {
+    const isParkingClick = sprite.parking.containsPoint(currentPosition);
+    const lineName = name as LineName;
 
-    ixLines[lineColor].isDrawing = false;
+    ixGraphics[lineName].isDrawing = false;
 
     if (isParkingClick) {
-      ixLines[lineColor].isFinished = true;
+      ixGraphics[lineName].isFinished = true;
 
-      // Убрать интерактивность у машины
-      if (sprite.car !== null) {
-        sprite.car.eventMode = 'none';
-        sprite.car.cursor = 'auto';
-      }
+      disableInteractivity(sprite.car);
 
-      const isAllLinesFinished = Object.values(ixLines)
-        .map((line) => line.isFinished)
-        .every((value) => value);
+      const isAllLinesFinished = checkLinesFinality(ixGraphics);
 
       if (isAllLinesFinished) {
         moveCarsToParking();
       }
-    } else if (!ixLines[lineColor].isFinished) {
+    } else if (!ixGraphics[lineName].isFinished) {
       // Очистить линию
-      ixLines[lineColor].graphics?.clear();
-      ixLines[lineColor].points = [];
+      ixGraphics[lineName].pixi.clear();
+      ixGraphics[lineName].points = [];
     }
   }
 };
@@ -397,21 +224,22 @@ const resizeApp = (): void => {
   // Задать новые размеры сцены
   app.renderer.resize(window.innerWidth, window.innerHeight);
 
-  for (const [key, options] of Object.entries(ixAssets)) {
-    const { x, y } = ixAssets[key as AssetName];
+  const assetOptions = Object.entries(ASSETS_OPTIONS);
 
-    // Сохранить позиции изображений
-    if (options.sprite !== null) {
-      options.sprite.x = app.screen.width * x;
-      options.sprite.y = app.screen.height * y;
-    }
+  for (let i = 0; i < assetOptions.length; i += 1) {
+    const [name, options] = assetOptions[i];
+    const assetName = name as AssetName;
+
+    // Сохранить относительное положение спрайтов
+    ixSprites[assetName].x = app.screen.width * options.x;
+    ixSprites[assetName].y = app.screen.height * options.y;
   }
 };
 
 // Инициализировать приложение
 addAppToDOM();
-configureAssetsAndAddThemToStage();
-addLinesToStage();
+addSpritesToStage();
+addGraphicToStage();
 moveHandToRedParking();
 
 // Запустить анимацию
