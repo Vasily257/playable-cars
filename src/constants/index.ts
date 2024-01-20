@@ -110,14 +110,14 @@ const ASSETS_OPTIONS: Record<AssetName, AssetOption> = {
     source: parkingLinePng,
   },
   yellowParking: {
-    x: 0.394,
-    y: 0.183,
+    x: 0.393,
+    y: 0.197,
     z: 1,
     source: parkingYellowPng,
   },
   redParking: {
     x: 0.609,
-    y: 0.183,
+    y: 0.197,
     z: 1,
     source: parkingRedPng,
   },
