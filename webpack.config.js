@@ -7,8 +7,10 @@ module.exports = {
   mode: 'development',
   entry: './src/index.ts',
   output: {
+    publicPath: '',
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js',
+    clean: true,
   },
   module: {
     rules: [
@@ -29,15 +31,7 @@ module.exports = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/i,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'images/',
-            },
-          },
-        ],
+        type: 'asset/inline',
       },
       {
         test: /\.css$/,
