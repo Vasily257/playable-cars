@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlInlineScriptPlugin = require('html-inline-script-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -49,6 +50,7 @@ module.exports = {
       template: './src/index.html',
       filename: 'index.html',
     }),
+    new HtmlInlineScriptPlugin(),
   ],
   resolve: {
     extensions: ['.ts', '.js'],
