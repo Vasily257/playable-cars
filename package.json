@@ -4,7 +4,7 @@
   "description": "",
   "main": "bundle.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --mode production",
     "start": "node dist/bundle.js",
     "dev": "webpack serve --mode development --open",
     "lint": "eslint . --ext .js,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
